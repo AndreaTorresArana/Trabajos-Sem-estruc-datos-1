@@ -1,0 +1,140 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Empleado {
+private:
+    int claveEmpleado;
+    string nombre;
+    string domicilio;
+    float sueldo;
+    string reportaA;
+
+public:
+    // Constructor
+    Empleado(int clave, string nom, string dom, float suel, string reporta)
+        : claveEmpleado(clave), nombre(nom), domicilio(dom), sueldo(suel), reportaA(reporta) {}
+
+    // Método para imprimir los datos del empleado
+    void imprime() {
+        cout << "Clave: " << claveEmpleado << endl;
+        cout << "Nombre: " << nombre << endl;
+        cout << "Domicilio: " << domicilio << endl;
+        cout << "Sueldo: " << sueldo << endl;
+        cout << "Reporta a: " << reportaA << endl;
+    }
+
+    // Método para cambiar el domicilio del empleado
+    void cambiaDomicilio(string nuevoDomicilio) {
+        domicilio = nuevoDomicilio;
+    }
+
+    // Método para cambiar la persona a quien reporta
+    void cambiaReportaA(string nuevoReportaA) {
+        reportaA = nuevoReportaA;
+    }
+
+    // Método para actualizar el sueldo del empleado
+    void actualizaSueldo(float porcentajeIncremento) {
+        sueldo += sueldo * (porcentajeIncremento / 100);
+    }
+
+    // Método para obtener la clave del empleado
+    int getClaveEmpleado() {
+        return claveEmpleado;
+    }
+};
+
+int main() {
+    // Declaración de objetos JefePlanta y JefePersonal
+    Empleado JefePlanta(1, "Carlos Perez", "Calle Falsa 123", 50000, "Director General");
+    Empleado JefePersonal(2, "Ana Lopez", "Av. Siempreviva 456", 45000, "Director General");
+
+    int opcion, claveEmpleado;
+    string nuevoDomicilio, nuevoReportaA;
+    float porcentajeIncremento;
+
+    do {
+        cout << "\nMenú de opciones:\n";
+        cout << "1. Cambiar el domicilio de un empleado\n";
+        cout << "2. Actualizar el sueldo de un empleado\n";
+        cout << "3. Imprimir los datos de un empleado\n";
+        cout << "4. Cambiar la persona a quien reporta un empleado\n";
+        cout << "5. Salir\n";
+        cout << "Ingrese su opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            cout << "Ingrese la clave del empleado: ";
+            cin >> claveEmpleado;
+            cout << "Ingrese el nuevo domicilio: ";
+            cin.ignore();
+            getline(cin, nuevoDomicilio);
+
+            if (claveEmpleado == JefePlanta.getClaveEmpleado()) {
+                JefePlanta.cambiaDomicilio(nuevoDomicilio);
+            } else if (claveEmpleado == JefePersonal.getClaveEmpleado()) {
+                JefePersonal.cambiaDomicilio(nuevoDomicilio);
+            } else {
+                cout << "Empleado no encontrado.\n";
+            }
+            break;
+
+        case 2:
+            cout << "Ingrese la clave del empleado: ";
+            cin >> claveEmpleado;
+            cout << "Ingrese el porcentaje de incremento: ";
+            cin >> porcentajeIncremento;
+
+            if (claveEmpleado == JefePlanta.getClaveEmpleado()) {
+                JefePlanta.actualizaSueldo(porcentajeIncremento);
+            } else if (claveEmpleado == JefePersonal.getClaveEmpleado()) {
+                JefePersonal.actualizaSueldo(porcentajeIncremento);
+            } else {
+                cout << "Empleado no encontrado.\n";
+            }
+            break;
+
+        case 3:
+            cout << "Ingrese la clave del empleado: ";
+            cin >> claveEmpleado;
+
+            if (claveEmpleado == JefePlanta.getClaveEmpleado()) {
+                JefePlanta.imprime();
+            } else if (claveEmpleado == JefePersonal.getClaveEmpleado()) {
+                JefePersonal.imprime();
+            } else {
+                cout << "Empleado no encontrado.\n";
+            }
+            break;
+
+        case 4:
+            cout << "Ingrese la clave del empleado: ";
+            cin >> claveEmpleado;
+            cout << "Ingrese el nuevo nombre de la persona a quien reporta: ";
+            cin.ignore();
+            getline(cin, nuevoReportaA);
+
+            if (claveEmpleado == JefePlanta.getClaveEmpleado()) {
+                JefePlanta.cambiaReportaA(nuevoReportaA);
+            } else if (claveEmpleado == JefePersonal.getClaveEmpleado()) {
+                JefePersonal.cambiaReportaA(nuevoReportaA);
+            } else {
+                cout << "Empleado no encontrado.\n";
+            }
+            break;
+
+        case 5:
+            cout << "Saliendo del programa...\n";
+            break;
+
+        default:
+            cout << "Opción no válida. Intente nuevamente.\n";
+        }
+
+    } while (opcion != 5);
+
+    return 0;
+}
