@@ -1,0 +1,211 @@
+#include <iostream>
+const int TAM = 100;
+using namespace std;
+
+class Constancia {
+private:
+    int MateriasAprobadas;
+    string Nombre;
+    string Carrera;
+    float PromedioGeneral;
+public:
+    Constancia() {}
+    Constancia(int ce, string n, string d, float s) : MateriasAprobadas(ce), Nombre(n), Carrera(d), PromedioGeneral(s) {}
+
+    string getNombre() {
+        return Nombre;
+    }
+
+    bool operator ==(Constancia& e) {
+        return Nombre == e.Nombre;
+    }
+
+    friend istream& operator >>(istream& i, Constancia& e) {
+        cout << "\n Ingresa nombre: ";
+        i >> e.Nombre;
+        cout << "\n Ingresa Carrera: ";
+        i >> e.Carrera;
+        cout << "\n Ingresa total de materias aprobadas: ";
+        i >> e.MateriasAprobadas;
+        cout << "\n Ingresa el promedio general: ";
+        i >> e.PromedioGeneral;
+        return i;
+    }
+
+    friend ostream& operator <<(ostream& o, Constancia& e) {
+        o << " Nombre: " << e.Nombre;
+        o << "\n Carrera: " << e.Carrera;
+        o << "\n Materias aprobadas: " << e.MateriasAprobadas;
+        o << "\n Promedio General: " << e.PromedioGeneral;
+        return o;
+    }
+};
+
+class Pila {
+private:
+    Constancia datos[TAM];
+    int ult;
+
+    int busquedaBinaria(Constancia elem) {
+        int izq = 0;
+        int der = ult;
+        while (izq <= der) {
+            int medio = (izq + der) / 2;
+            if (datos[medio] == elem) {
+                return medio;  // Retorna la posición
+            }
+            if (elem.getNombre() < datos[medio].getNombre()) {
+                der = medio - 1;  // Ajustar el límite superior
+            } else {
+                izq = medio + 1;  // Ajustar el límite inferior
+            }
+        }
+        return -1;  // No encontrado
+    }
+
+public:
+    Pila() : ult(-1) {}
+
+    bool vacia() const {
+        return ult == -1;
+    }
+
+    bool llena() const {
+        return ult == TAM - 1;
+    }
+
+    int ultimo() const {
+        return ult;
+    }
+
+    void encolar(Constancia e) {
+        if (!llena()) {
+            ult++;
+            datos[ult] = e;
+        } else {
+            cout << "La cola esta llena." << endl;
+        }
+    }
+
+    bool elimina(int pos) {
+        if (vacia() || pos < 0 || pos > ult) {
+            cout << "\n Error de eliminacion";
+            return true;
+        }
+        for (int i = pos; i < ult; i++) {
+            datos[i] = datos[i + 1];
+        }
+        ult--;
+        return false;
+    }
+
+    void desencolar() {
+        if (!vacia()) {
+            elimina(0);
+        } else {
+            cout << "No hay solicitudes para elaborar constancias." << endl;
+        }
+    }
+
+    void mostrarPrimero() {
+        if (!vacia()) {
+            cout << datos[0] << endl;
+        } else {
+            cout << "No hay solicitudes." << endl;
+        }
+    }
+
+    int buscar(Constancia elem) {
+        for (int i = 0; i <= ult; i++) {
+            if (datos[i] == elem) {
+                return i;  // Retorna la posición
+            }
+        }
+        return -1;  // No encontrado
+    }
+
+    int solicitudesRestantes(Constancia elem) {
+        int pos = buscar(elem);
+        if (pos != -1) {
+            return pos;
+        } else {
+            return -1;
+        }
+    }
+
+    int buscarBinaria(Constancia elem) {
+        return busquedaBinaria(elem);
+    }
+};
+
+int main() {
+    Pila MiPila;
+    Constancia molde;
+    int menu = 0;
+    string opc;
+
+    while (menu != 4) {
+        cout << "\n--------MENU---------";
+        cout << "\n1. Dar de alta la solicitud de un alumno";
+        cout << "\n2. Elaborar una constancia";
+        cout << "\n3. Buscar una solicitud";
+        cout << "\n4. Salir";
+        cout << "\nSeleccione una opcion: ";
+        cin >> menu;
+
+        switch (menu) {
+            case 1:
+                // Dar de alta la solicitud de un alumno (encolar)
+                cin >> molde;
+                MiPila.encolar(molde);
+                cout << "\nSolicitud registrada exitosamente.";
+                break;
+
+            case 2:
+                // Elaborar una constancia (desencolar)
+                if (MiPila.vacia()) {
+                    cout << "\nNo hay solicitudes para elaborar constancias.";
+                } else {
+                    cout << "Elaborando constancia para el siguiente alumno:\n";
+                    MiPila.mostrarPrimero();
+                    MiPila.desencolar();
+                    cout << "\nConstancia elaborada exitosamente.";
+                }
+                break;
+
+            case 3: {
+                // Buscar una solicitud y mostrar cuántas faltan para su turno
+                cout << "\nIngrese el nombre del alumno para buscar su solicitud: ";
+                string nombreBuscado;
+                cin >> nombreBuscado;
+                Constancia solicitudBusqueda;
+                solicitudBusqueda = Constancia(0, nombreBuscado, "", 0.0f);  // Solo necesitamos el nombre para buscar
+
+                int pos = MiPila.solicitudesRestantes(solicitudBusqueda);
+                if (pos == -1) {
+                    cout << "Solicitud no encontrada. Debe dar de alta una solicitud.";
+                } else {
+                    cout << "\n Faltan: " << pos << " solicitudes antes de que toque el turno de elaborar su constancia.";
+                }
+
+                //búsqueda binaria
+                int posBinaria = MiPila.buscarBinaria(solicitudBusqueda);
+                if (posBinaria != -1) {
+                    cout << "\n \n Solicitud encontrada mediante busqueda binaria en la posicion: " << posBinaria;
+                } else {
+                    cout << "\nNo se encontro la solicitud mediante busqueda binaria.";
+                }
+                break;
+            }
+
+            case 4:
+                cout << "Saliendo...";
+                break;
+
+            default:
+                cout << "\nOpcion no válida. Inténtelo de nuevo.";
+        }
+    }
+
+    return 0;
+}
