@@ -1,0 +1,235 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX = 100;
+
+class Aspirantes {
+private:
+    string Nombre;
+    string Carrera;
+    string Preparatoria;
+    float Promedio;
+    int id;
+
+public:
+    // Método para imprimir los detalles del aspirante
+    void imprime() const {
+        cout << "Nombre del Alumno: " << Nombre << endl;
+        cout << "Carrera a la que aplica: " << Carrera << endl;
+        cout << "Preparatoria donde estudió: " << Preparatoria << endl;
+        cout << "Promedio obtenido: " << Promedio << endl;
+    }
+
+    // Sobrecarga de operadores
+    bool operator ==(const Aspirantes& other) const {
+        return id == other.id;
+    }
+
+    bool operator!=(const Aspirantes& other) const {
+        return id != other.id;
+    }
+
+    friend ostream& operator<<(ostream& os, const Aspirantes& aspirante) {
+        os << "Id del Aspirante: " << aspirante.id << endl;
+        os << "Nombre: " << aspirante.Nombre << endl;
+        os << "Carrera: " << aspirante.Carrera << endl;
+        os << "Preparatoria: " << aspirante.Preparatoria << endl;
+        os << "Promedio: " << aspirante.Promedio << endl;
+        return os;
+    }
+
+    friend istream& operator>>(istream& is, Aspirantes& aspirante) {
+        cout << "Ingresa el nombre del aspirante: ";
+        is.ignore(); // Ignora el carácter de nueva línea pendiente
+        getline(is, aspirante.Nombre);
+        cout << "Ingresa la carrera: ";
+        getline(is, aspirante.Carrera);
+        cout << "Ingresa el nombre de la preparatoria: ";
+        getline(is, aspirante.Preparatoria);
+        cout << "Ingresa el promedio obtenido: ";
+        is >> aspirante.Promedio;
+        cout << "Ingresa el Id: ";
+        is >> aspirante.id;
+        return is;
+    }
+
+    float getPromedio() const {
+        return Promedio;
+    }
+
+    int getId() const {
+        return id;
+    }
+};
+
+class ListaEstatica {
+private:
+    Aspirantes Datos[MAX];
+    int Tam;
+
+public:
+    ListaEstatica(): Tam(0) {}
+
+    // Función para realizar el particionamiento del Quicksort
+    int Quick(int extizq, int extder) {
+        float pivote = Datos[(extizq + extder) / 2].getPromedio();
+        int i = extizq;
+        int j = extder;
+
+        while (i <= j) {
+            while (Datos[i].getPromedio() > pivote) {
+                i++;
+            }
+            while (Datos[j].getPromedio() < pivote) {
+                j--;
+            }
+            if (i <= j) {
+                swap(Datos[i], Datos[j]); // Usa std::swap
+                i++;
+                j--;
+            }
+        }
+        return i;
+    }
+
+    // Función recursiva para realizar Quicksort
+    void QuickSort(int extizq, int extder) {
+        if (extizq < extder) {
+            int pi = Quick(extizq, extder);
+            QuickSort(extizq, pi - 1);
+            QuickSort(pi, extder);
+        }
+    }
+
+    // Inserta un nuevo aspirante manteniendo la lista ordenada por promedio descendente
+    int Inserta(Aspirantes elemento) {
+        if (Tam == MAX) {
+            return -1; // Error: Lista llena
+        }
+
+        int i = Tam - 1;
+        // Desplaza elementos hasta encontrar la posición correcta
+        while (i >= 0 && Datos[i].getPromedio() < elemento.getPromedio()) {
+            Datos[i + 1] = Datos[i];
+            i--;
+        }
+        Datos[i + 1] = elemento;
+        Tam++;
+
+        return 0; // Éxito
+    }
+
+    // Búsqueda binaria para encontrar un aspirante por su ID
+    int busquedaBinaria(int elem) {
+        int i = 0;
+        int j = Tam - 1;
+
+        while (i <= j) {
+            int medio = (i + j) / 2;
+
+            if (Datos[medio].getId() == elem) {
+                return medio;
+            } else if (Datos[medio].getId() > elem) {
+                j = medio - 1;
+            } else {
+                i = medio + 1;
+            }
+        }
+        return -1;
+    }
+
+    // Verifica si la lista está vacía
+    bool vacia() const {
+        return Tam == 0;
+    }
+
+    // Verifica si la lista está llena
+    int Llena() const {
+        return (Tam == MAX) ? 1 : 0;
+    }
+
+    // Muestra todos los aspirantes en la lista
+    void Muestra() const {
+        for (int i = 0; i < Tam; i++) {
+            cout << Datos[i] << endl;
+        }
+    }
+
+    // Muestra un aspirante específico
+    void MuestraElemento(int pos) const {
+        if (pos >= 0 && pos < Tam) {
+            cout << "ID de Aspirante: " << Datos[pos].getId() << endl;
+            Datos[pos].imprime();
+        }
+    }
+
+    int getTam() const {
+        return Tam;
+    }
+};
+
+int main() {
+    ListaEstatica lista;
+    Aspirantes datosAspirante;
+    int opcion;
+    int elemento, posicion;
+
+    do {
+        // Mostrar el menú
+        cout << "\nMenu:" << endl;
+        cout << "1. Buscar" << endl;
+        cout << "2. dar de alta una solicitud" << endl;
+        cout << "3. Mostrar todos" << endl;
+        cout << "4. Salir" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1: // Buscar
+                if (lista.vacia()) {
+                    cout << "Lista vacía." << endl;
+                } else {
+                    cout << "Ingrese el Id a buscar: ";
+                    cin >> elemento;
+                    posicion = lista.busquedaBinaria(elemento);
+                    if (posicion != -1) {
+                        cout << "Elemento encontrado en la posición: " << posicion << endl;
+                        lista.MuestraElemento(posicion);
+                    } else {
+                        cout << "El elemento con Id " << elemento << " no se encuentra en la lista." << endl;
+                    }
+                }
+                break;
+
+            case 2: // Insertar
+                cout << "Ingresa los datos del aspirante:" << endl;
+                cin >> datosAspirante;
+                if (lista.Inserta(datosAspirante) == 0) {
+                    cout << "Elemento insertado correctamente." << endl;
+                } else {
+                    cout << "Error al insertar el elemento. Lista llena." << endl;
+                }
+                break;
+
+            case 3: // Mostrar todos
+                if (lista.vacia()) {
+                    cout << "Lista vacía." << endl;
+                } else {
+                    cout << "\n Lista de aspirantes:" << endl;
+                    lista.Muestra();
+                }
+                break;
+
+            case 4: // Salir
+                cout << "Saliendo del programa." << endl;
+                break;
+
+            default:
+                cout << "Opción no válida. Intente de nuevo." << endl;
+                break;
+        }
+    } while (opcion != 4);
+
+    return 0;
+}
